@@ -41,9 +41,16 @@ Over Clause
               RANK() OVER(Partition BY Product , ORDER BY Sales DESC)
 
 ==> Frame Clause - defines a subset of rows within each window that is relevant for calculation
+     AVG(Sales) OVER (PARTITION BY Category ORDER BY OrderDate
+      ROWS BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING )
+          [PRECEDING, PROCEEDING, FOLLOWING, CURRENT] 
+RULES
+   --- Frame Clause cannot be used without order by clause 
+   --- Lower bound value must before the higher bound value
 
-
-
-
-
+WINDOW FN RULES
+ -- can be used only in SELECT AND ORDER BY Clauses
+ -- nesting window fn is not allowed
+ -- window fns executes after where condition
+ -- window fns can be used together with GROUP BY in same query, only if same columns are used [step1:group by , step2: window fn]
 
