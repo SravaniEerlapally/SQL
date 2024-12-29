@@ -1,0 +1,49 @@
+Group By
+  - for simple data analysis
+  - returns single row(value) for each group
+  -only aggregation fn
+
+SELECT Order_id, Order_date ,Product_id, SUM(sales) FROM Sales.Orders GROUP BY Product_id
+    --->throws an error to avoid this we need to order id & date also to group by, but it won't return o/p based on product_id so here window fn we use
+
+
+Window Fn
+  - for advance data analysis
+  - returns a result for each row
+  - aggregate fns + Rank Fns(row no,rank,percentilee,dense rankmpercent rank,cume dist) + Value Fns(lead,lag,first_value,last_value)
+                                                                                                      
+SELECT Product_ID, SUM(sales) OVER(PARTITION BY Product_Id) as TotalSalesByProduct FROM Sales.Orders
+
+WINDOW SYNTAX
+===>It has 2 parts
+     Window fn                                        |  Over Clause
+    Aggregate Fns   RANK Fns   Value Fns              |   Partition Clause        Order Clause      Frame Clause
+
+Window Fn
+ - calculation used on window i.e as normal sql query [function expression AVG(sales)]
+==> Aggregate fns - except count(any data type) & all sum,avg,max,min are numeric
+==> Rank fns - except ntile(numeric) & all row_no(),rank() etc are empty
+==>Value fns - All Data Type
+
+Over Clause
+ - tells the fn used in a window fn , it defines a window or subset of data
+==> Partition By - divides the result set into partitions(windows)
+                   divides rows into groups based on columns
+   Without Partition By - Total Sales across all rows(Entire Result Set)
+                            SUM(Sales) OVER()
+   Partition By Single Column - Total Sales for each Product
+                            SUM(sales) OVER(PARTITION BY Product)
+   Partition By Combined-Columns - Total Sales for each combination of Product, OrderStatus
+                            SUM(sales) OVER(PARTITION BY Product, OrderStatus )
+
+==> Order By - sort the data within a window
+             - for rank & value order clause is must
+              RANK() OVER(Partition BY Product , ORDER BY Sales DESC)
+
+==> Frame Clause - defines a subset of rows within each window that is relevant for calculation
+
+
+
+
+
+
