@@ -1,0 +1,163 @@
+CREATE TABLE employee(
+  emp_id int,
+  emp_name text,
+  dept_name text,
+  sal decimal(10,2)
+);
+
+//Insert Data
+insert into employee values(1,'John Doe','Sales',50000);
+insert into employee values(2,'Jane Smith','Engineering',75000);
+insert into employee values(3,'Alice Johnson','HR',60000);
+insert into employee values(4,'Bob Brown','Sales',55000);
+insert into employee values(5,'Charlie White','Engineering',70000);
+insert into employee values(6,'David Green','HR',65000);
+
+SELECT * FROM employee e;
+
+Q1) Rank employee based on the salary?
+
+SELECT emp_name, sal , dept_name,
+rank() over (order by sal) "salary_rank"
+FROM employee e;
+
+Q2) Rank employee based on the department?
+
+SELECT emp_name, sal , dept_name,
+rank() over (partition by dept_name order by sal) salary_rank
+FROM employee e;
+
+Here What it does?
+1st groups all emp based on departments -> then do the rank based up on salary column
+
+// In Descending order
+SELECT emp_name, sal , dept_name,
+rank() over (partition by dept_name order by sal desc) salary_rank
+FROM employee e;
+
+Q3) Get Sum of Salary for each Departemnt?
+
+// GENERAL WAY
+
+SELECT dept_name, sum(sal) 
+FROM employee
+GROUP BY dept_name;
+
+In aggregate functions need to give all category based columns for group by, otherwise it fails to run
+I want emp_name,sal also to be viewed, so need to add emp_name,sal in group by
+
+SELECT emp_name,sal,dept_name, sum(sal) 
+FROM employee
+GROUP BY dept_name,emp_name;
+
+// WINDOW FN
+
+SELECT emp_name,sal,dept_name, sum(sal),
+over (parition by dept_name)
+FROM employee;
+
+Q4) Get all emp either salary above avg or below avg?
+
+SELECT emp_name,sal,dept_name, sal - avg(sal),
+over (parition by dept_name)
+FROM employee e;
+
+Q5) Get Top Salary of every department
+
+//GENERAL WAY
+
+SELECT dept_name,max(sal) 
+FROM employee
+GROUP BY dept_name;
+
+Want to get emp_name also, but need to be added in group by.
+If we add emp_name in group by along with dept_name. How can it do?
+
+So we use Window Fn
+//WINDOW FN
+
+SELECT * FROM(
+SELECT emp_name,sal,dept_name,
+RANK() OVER (PARTITION BY dept_name ORDER BY sal desc) salary_rank
+FROM employee e
+) WHERE salary_rank = 1 ;
+
+// Supports in Snowflake, Terraform it is like having in Window fn
+SELECT emp_name,sal,dept_name,
+RANK() OVER (PARTITION BY dept_name ORDER BY sal desc) salary_rank
+FROM employee e
+QUALIFY salary_rank = 1 ;
+
+Q6) Emp who has same salary
+
+insert into employee values(1,'John Doe','Sales',50000);
+insert into employee values(2,'Jane Smith','Engineering',75000);
+insert into employee values(3,'Alice Johnson','HR',60000);
+insert into employee values(4,'Bob Brown','Sales',55000);
+insert into employee values(5,'Charlie White','Engineering',70000);
+insert into employee values(6,'David Green','HR',65000);
+insert into employee values(7,'Robert Green','HR',50000);
+
+SELECT * FROM employee e;
+
+// RANK - will skip the rank if there are same values get tie
+
+SELECT emp_name, sal , dept_name,
+rank() over (partition by dept_name order by sal desc) salary_rank
+FROM employee e;
+
+// DENSE RANK - will not skip the rank if there are same values get tie
+
+SELECT emp_name, sal , dept_name,
+dense_rank() over (partition by dept_name order by sal desc) salary_rank
+FROM employee e;
+
+//TIE Break based on emp_name
+
+SELECT * FROM(
+SELECT emp_name,sal,dept_name,
+RANK() OVER (PARTITION BY dept_name ORDER BY sal desc, emp_name) salary_rank
+FROM employee e
+) WHERE salary_rank = 1 ;
+
+//ROW NUMBER - gives randomly only 1 row for each department for rank = 1
+
+SELECT * FROM(
+SELECT emp_name,sal,dept_name,
+ROW_NUMBER() OVER (PARTITION BY dept_name ORDER BY sal desc) salary_rank
+FROM employee e
+) WHERE salary_rank = 1 ;
+
+Q7) To view last row and earlier row i.e 
+How sales increased from last month to current month?
+
+CREATE TABLE sales_data(
+   month_num int,
+   sales_amount decimal(10,2)
+);
+
+insert into sales_data values(1,10000);
+insert into sales_data values(2,15000);
+insert into sales_data values(3,7000);
+insert into sales_data values(4,25000);
+
+SELECT * FROM sales_data;
+
+SELECT month_num, sales_amount,
+LAG(sales_amount) OVER (ORDER BY month_num)
+FROM sales_data;
+
+//Trend whether going up or down
+SELECT month_num, sales_amount,
+LAG(sales_amount) OVER (ORDER BY month_num),
+CASE WHEN
+sales_amount - LAG(sales_amount) OVER (ORDER BY month_num) > 0 then 'Up'
+WHEN
+sales_amount - LAG(sales_amount) OVER (ORDER BY month_num) < 0 then 'Down'
+END trend
+FROM sales_data;
+
+Need to watch from 33 minutes of May 8,2026
+
+
+
