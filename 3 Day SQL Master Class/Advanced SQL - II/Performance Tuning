@@ -1,0 +1,35 @@
+When we talk about performance, 1st thing we use is Indexes
+
+Indexes
+Why do we use indexes in Database? Indexes help in improving the performance
+Eg: Book , with help of indexes we can go to any page refer to that pages context.
+We take data in a particular table then we sort the data and store in some particular area.
+From there if you wanted to search the data, as it sorted data, Searching is easier.
+
+B tree Data Structure
+One of the way, the Database stores its information in sorted order is B-Tree Structure. It improves the performance.
+Traversing a tree from top to bottom is much more faster than reading every value.
+
+Q)If indexes improve the performancethen I can index every column in table right?
+A)Whatever query that I am writing, it will give good performnace. So I can create indexes on all columns.
+
+Diadvantage of Indexes?
+If you create an index, you are updating any row or if you deleting any row.
+We need to update the actual table as well as you have to update the index.
+For every update there will be 2writes that will be happening: one for table and one for index.
+If there are 2 indexes then : 1 for table, 2nd for 1st index, 3rd for 2nd index - here need to write in 3 places.
+This is where it impacts the performance.
+
+Indexes will be improve the read performance of table, but impacts the write performance.
+
+How do we create the index?
+
+
+
+
+
+
+
+
+
+
