@@ -159,5 +159,25 @@ FROM sales_data;
 
 Need to watch from 33 minutes of May 8,2026
 
+//Cumulative Sum
+SELECT month_num, sales_amount, 
+SUM(sales_amount) OVER(ORDER BY month_num) as cumulative_sales
+FROM sales_data;
+
+//using unbounded preceding to get cumulative sum form start
+SELECT month_num, sales_amount, 
+SUM(sales_amount) OVER(ORDER BY month_num
+                          rows between unbounded preceding and current row) as cumulative_sales
+FROM sales_data;
+
+//unbounded following to get cumulative sum from the current row to the end
+SELECT month_num, sales_amount, 
+SUM(sales_amount) OVER(ORDER BY month_num
+                          rows between unbounded preceding and unbounded following) as cumulative_sales
+FROM sales_data;
+
+How much well they know window functions decides their advanced sql skill.
+In interviews they give a scenario, and asks to write a query?
+
 
 
